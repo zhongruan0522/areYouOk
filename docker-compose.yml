@@ -12,6 +12,10 @@ services:
       - PORT=7965
       - TZ=Asia/Shanghai
       - DB_PATH=/app/data/expense_bills.db
+      # JWT 登录密钥：强烈建议在生产环境中使用随机且足够复杂的字符串
+      # 示例生成方式（Node）：node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+      # 请务必自行替换为自己的随机密钥，不要使用示例值
+      - LOGIN_JWT_SECRET=please-change-me-to-a-random-secret
       # 登录账号配置：访问页面前需要输入的用户名和密码
       # 请根据需要修改为自己的账号密码
       - LOGIN_USERNAME=admin
@@ -19,7 +23,6 @@ services:
     volumes:
       - ./data:/app/data:rw
       - ./logs:/app/logs:rw
-    user: "1000:1000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 30s

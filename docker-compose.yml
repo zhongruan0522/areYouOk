@@ -12,6 +12,10 @@ services:
       - PORT=7965
       - TZ=Asia/Shanghai
       - DB_PATH=/app/data/expense_bills.db
+      # 登录账号配置：访问页面前需要输入的用户名和密码
+      # 请根据需要修改为自己的账号密码
+      - LOGIN_USERNAME=admin
+      - LOGIN_PASSWORD=admin123
     volumes:
       - ./data:/app/data:rw
       - ./logs:/app/logs:rw

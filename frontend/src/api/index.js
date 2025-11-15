@@ -5,9 +5,22 @@ const api = axios.create({
   timeout: 30000
 })
 
-// 单用户系统，无需在请求头中添加认证信息
-// 智谱AI Token已存储在系统数据库中，后端自动从数据库读取
+// 登录 Token 统一通过请求拦截器注入到请求头中
+api.interceptors.request.use(
+  (config) => {
+    const loginToken = localStorage.getItem('login_token')
+    if (loginToken) {
+      config.headers = config.headers || {}
+      if (!config.headers.Authorization) {
+        config.headers.Authorization = `Bearer ${loginToken}`
+      }
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
 
+// 统一处理响应结构，直接返回后端 data 字段
 api.interceptors.response.use(
   (response) => {
     return response.data
@@ -22,6 +35,7 @@ api.interceptors.response.use(
 )
 
 export default {
+  // 账单相关
   syncBills(billingMonth, type = 'full') {
     return api.post('/bills/sync', { billingMonth, type })
   },
@@ -54,10 +68,6 @@ export default {
     return api.get('/bills/total-cost-progress')
   },
 
-  getAutoSyncConfig() {
-    return api.get('/auto-sync/config')
-  },
-
   getStats(period = '5h') {
     return api.get('/bills/stats', { params: { period } })
   },
@@ -66,12 +76,11 @@ export default {
     return api.get('/bills/sync-status')
   },
 
-  // 保存同步历史记录
+  // 同步历史
   saveSyncHistory(historyData) {
     return api.post('/bills/sync-history', historyData)
   },
 
-  // 获取同步历史记录
   getSyncHistory(syncType, limit = 10, page = 1) {
     const offset = (page - 1) * limit
     return api.get('/bills/sync-history', {
@@ -79,7 +88,60 @@ export default {
     })
   },
 
-  // Token管理
+  // 使用统计
+  getHourlyUsage(hours = 5) {
+    return api.get('/bills/hourly-usage', { params: { hours } })
+  },
+
+  getDailyUsage(days = 7) {
+    return api.get('/bills/daily-usage', { params: { days } })
+  },
+
+  getMonthlyUsage() {
+    return api.get('/bills/daily-usage', { params: { days: 30 } })
+  },
+
+  getProductDistribution(hours = 5) {
+    return api.get('/bills/product-distribution', { params: { hours } })
+  },
+
+  getDayApiUsage() {
+    return api.get('/bills/day-api-usage')
+  },
+
+  getDayTokenUsage() {
+    return api.get('/bills/day-token-usage')
+  },
+
+  getDayTotalCost() {
+    return api.get('/bills/day-total-cost')
+  },
+
+  getWeekApiUsage() {
+    return api.get('/bills/week-api-usage')
+  },
+
+  getWeekTokenUsage() {
+    return api.get('/bills/week-token-usage')
+  },
+
+  getWeekTotalCost() {
+    return api.get('/bills/week-total-cost')
+  },
+
+  getMonthApiUsage() {
+    return api.get('/bills/month-api-usage')
+  },
+
+  getMonthTokenUsage() {
+    return api.get('/bills/month-token-usage')
+  },
+
+  getMonthTotalCost() {
+    return api.get('/bills/month-total-cost')
+  },
+
+  // Token 管理
   verifyToken(token) {
     return api.post('/tokens/verify', { token })
   },
@@ -96,7 +158,7 @@ export default {
     return api.delete('/tokens/delete')
   },
 
-  // 自动同步相关
+  // 自动同步
   getAutoSyncConfig() {
     return api.get('/auto-sync/config')
   },
@@ -113,68 +175,13 @@ export default {
     return api.post('/auto-sync/stop')
   },
 
-  // 获取每小时调用次数和Token数量
-  getHourlyUsage(hours = 5) {
-    return api.get('/bills/hourly-usage', { params: { hours } })
+  // 登录相关
+  login(username, password) {
+    return api.post('/auth/login', { username, password })
   },
 
-  // 获取每天调用次数和Token数量
-  getDailyUsage(days = 7) {
-    return api.get('/bills/daily-usage', { params: { days } })
-  },
-
-  // 获取近30天每天调用次数和Token数量
-  getMonthlyUsage() {
-    return api.get('/bills/daily-usage', { params: { days: 30 } })
-  },
-
-  // 获取产品分布统计
-  getProductDistribution(hours = 5) {
-    return api.get('/bills/product-distribution', { params: { hours } })
-  },
-
-  // 获取近1天API使用量统计
-  getDayApiUsage() {
-    return api.get('/bills/day-api-usage')
-  },
-
-  // 获取近1天Token使用量统计
-  getDayTokenUsage() {
-    return api.get('/bills/day-token-usage')
-  },
-
-  // 获取近1天累计花费金额统计
-  getDayTotalCost() {
-    return api.get('/bills/day-total-cost')
-  },
-
-  // 获取近1周API使用量统计
-  getWeekApiUsage() {
-    return api.get('/bills/week-api-usage')
-  },
-
-  // 获取近1周Token使用量统计
-  getWeekTokenUsage() {
-    return api.get('/bills/week-token-usage')
-  },
-
-  // 获取近1周累计花费金额统计
-  getWeekTotalCost() {
-    return api.get('/bills/week-total-cost')
-  },
-
-  // 获取近1月API使用量统计
-  getMonthApiUsage() {
-    return api.get('/bills/month-api-usage')
-  },
-
-  // 获取近1月Token使用量统计
-  getMonthTokenUsage() {
-    return api.get('/bills/month-token-usage')
-  },
-
-  // 获取近1月累计花费金额统计
-  getMonthTotalCost() {
-    return api.get('/bills/month-total-cost')
+  checkLoginStatus() {
+    return api.get('/auth/status')
   }
 }
+

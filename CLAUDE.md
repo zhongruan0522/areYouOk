@@ -171,6 +171,25 @@ areYouOk/
    - 统计逻辑模块化，支持不同统计维度
    - 预留多租户支持（当前主要针对智谱AI）
 
+## Docker 部署
+
+### GitHub Container Registry
+项目使用 GitHub Actions 自动构建和发布 Docker 镜像到 GitHub Container Registry：
+
+- **镜像地址**：`ghcr.io/zhongruan0522/areYouOk:latest`
+- **自动构建**：推送到 main/master 分支时自动构建 latest 标签
+- **版本标签**：创建 v*.*.* 标签时自动构建对应版本
+
+### Docker Compose 配置
+```yaml
+services:
+  areyouok:
+    image: ghcr.io/${GITHUB_REPOSITORY:-zhongruan0522/areYouOk}:latest
+    # ... 其他配置
+```
+
+详细部署指南参考 [DOCKER.md](DOCKER.md) 文档。
+
 ### 验收标准
 - 数据同步准确率：100%
 - 统计结果实时更新，误差：0%

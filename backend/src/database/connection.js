@@ -13,14 +13,24 @@ const DB_PATH = process.env.DB_PATH
 // 确保数据库目录存在
 const dbDir = path.dirname(DB_PATH);
 if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true });
+    try {
+        fs.mkdirSync(dbDir, { recursive: true, mode: 0o755 });
+        console.log('数据库目录创建成功:', dbDir);
+    } catch (error) {
+        console.error('创建数据库目录失败:', error.message);
+        process.exit(1);
+    }
 }
 
 // 创建数据库连接
 const db = new sqlite3.Database(DB_PATH, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
     if (err) {
         console.error('数据库连接失败:', err.message);
+        console.error('数据库路径:', DB_PATH);
+        console.error('错误详情:', err);
+        process.exit(1);
     } else {
+        console.log('数据库连接成功:', DB_PATH);
         // 启用外键约束
         db.run('PRAGMA foreign_keys = ON', (err) => {
             if (err) {

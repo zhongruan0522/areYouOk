@@ -26,7 +26,7 @@
 ### Docker Compose
 
 ```bash
-# 启动服务
+# 启动服务（使用GitHub镜像）
 docker-compose up -d
 
 # 查看状态
@@ -39,13 +39,29 @@ docker-compose logs -f
 docker-compose down
 ```
 
+### GitHub Container Registry 镜像
+
+本项目使用 GitHub Actions 自动构建镜像到 GitHub Container Registry：
+
+```bash
+# 拉取最新镜像
+docker pull ghcr.io/zhongruan0522/areYouOk:latest
+
+# 拉取指定版本
+docker pull ghcr.io/zhongruan0522/areYouOk:v1.0.0
+```
+
+镜像地址：
+- 生产环境：`ghcr.io/zhongruan0522/areYouOk:latest`
+- 版本标签：`ghcr.io/zhongruan0522/areYouOk:v1.0.0`
+
 ## 🏗️ 构建和运行
 
 ### 手动构建
 
 ```bash
 # 构建镜像
-docker build -t areyouok-app:latest .
+docker build -t ghcr.io/zhongruan0522/areYouOk:latest .
 
 # 运行容器
 docker run -d \
@@ -54,23 +70,23 @@ docker run -d \
   -p 3000:3000 \
   -v $(pwd)/data:/app/data:rw \
   -v $(pwd)/logs:/app/logs:rw \
-  areyouok-app:latest
+  ghcr.io/zhongruan0522/areYouOk:latest
 ```
 
 ### 版本管理
 
 ```bash
 # 构建指定版本
-docker build -t areyouok-app:1.0.0 .
+docker build -t ghcr.io/zhongruan0522/areYouOk:1.0.0 .
 
 # 运行指定版本
 docker run -d --name areyouok-app -p 3000:3000 \
   -v $(pwd)/data:/app/data:rw \
   -v $(pwd)/logs:/app/logs:rw \
-  areyouok-app:1.0.0
+  ghcr.io/zhongruan0522/areYouOk:1.0.0
 
 # 查看镜像版本
-docker images | grep areyouok-app
+docker images | grep areyouok
 ```
 
 ## ⚙️ 配置说明
@@ -177,7 +193,7 @@ docker stop areyouok-app
 docker rm areyouok-app
 
 # 重新构建镜像
-docker build --no-cache -t areyouok-app .
+docker build --no-cache -t ghcr.io/zhongruan0522/areYouOk:latest .
 
 # 启动新容器
 docker run -d \
@@ -186,7 +202,7 @@ docker run -d \
   -p 3000:3000 \
   -v $(pwd)/data:/app/data:rw \
   -v $(pwd)/logs:/app/logs:rw \
-  areyouok-app
+  ghcr.io/zhongruan0522/areYouOk:latest
 ```
 
 ## 📞 访问地址

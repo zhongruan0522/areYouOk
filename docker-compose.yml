@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   areyouok:
-    image: pxvp2008/areyouok-app:latest
+    image: ghcr.io/${GITHUB_REPOSITORY:-zhongruan0522/areYouOk}:latest
     container_name: areyouok-app
     restart: unless-stopped
     ports:
@@ -11,9 +11,11 @@ services:
       - NODE_ENV=production
       - PORT=7965
       - TZ=Asia/Shanghai
+      - DB_PATH=/app/data/expense_bills.db
     volumes:
       - ./data:/app/data:rw
       - ./logs:/app/logs:rw
+    user: "1000:1000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 30s
